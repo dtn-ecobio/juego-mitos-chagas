@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Juego educativo sobre las vías de transmisión de la enfermedad de Chagas y los mitos frecuentes.">
+<title>¿Chagas o No Chagas?</title>
+<style>
+    :root {
+      --ink: #183b39;
+      --muted: #55716b;
+      --paper: #fffdf6;
+      --teal: #087f72;
+      --teal-dark: #076a60;
+      --line: #d9e9df;
+      --coral: #f28b70;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #eaf4e9;
+      color: var(--ink);
+      font-family: "DM Sans", "Trebuchet MS", sans-serif;
+    }
+    button { font: inherit; cursor: pointer; }
+    button:focus-visible { outline: 3px solid #ed7957; outline-offset: 4px; }
+    button:disabled { cursor: default; opacity: .6; }
+    .app-shell { width: 100%; min-height: 100%; padding: clamp(16px, 4vw, 48px); background: radial-gradient(circle at 95% 0%, #ffe4cc 0, transparent 35%), radial-gradient(circle at 0% 90%, #c8eee2 0, transparent 39%); }
+    .layout { max-width: 940px; margin: 0 auto; }
+    .topbar { display: flex; align-items: center; gap: 12px; margin-bottom: clamp(22px, 4vw, 40px); }
+    .brand-icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: var(--teal); color: white; flex: none; }
+    .brand-icon svg { width: 26px; height: 26px; }
+    .brand { font-weight: 800; letter-spacing: -.04em; }
+    .top-note { margin-left: auto; padding: 8px 12px; border: 1px solid #bfdcd0; border-radius: 999px; color: var(--muted); font-size: .8rem; font-weight: 700; }
+    .card { background: var(--paper); border: 1px solid rgba(24,59,57,.1); border-radius: 30px; box-shadow: 0 22px 65px rgba(32,89,72,.1); overflow: hidden; }
+    .screen { padding: clamp(24px, 6vw, 64px); }
+    .screen[hidden] { display: none; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--teal-dark); font-size: .77rem; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; }
+    .eyebrow:before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 670px; margin: 20px 0; font-size: clamp(2.7rem, 7vw, 5.4rem); line-height: 1.03; letter-spacing: -.065em; font-weight: 800; }
+    h2 { font-size: clamp(1.8rem, 4vw, 2.75rem); line-height: 1.15; letter-spacing: -.045em; }
+    .lead { max-width: 610px; color: var(--muted); font-size: clamp(1rem, 2vw, 1.18rem); line-height: 1.7; }
+    .primary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; padding: 13px 25px; border: 0; border-radius: 15px; background: var(--teal); color: white; font-weight: 800; transition: transform .2s, background .2s; }
+    .primary:hover:not(:disabled) { background: var(--teal-dark); transform: translateY(-2px); }
+    .intro-bottom { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; margin-top: 36px; }
+    .intro-hint { color: var(--muted); font-size: .9rem; }
+    .decoration { height: 14px; background: repeating-linear-gradient(100deg, #087f72 0 34px, #f28b70 34px 51px, #f4c977 51px 72px); }
+    .game-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .badge { display: inline-flex; align-items: center; border-radius: 100px; padding: 9px 14px; font-size: .85rem; font-weight: 800; background: #e0f4eb; color: var(--teal-dark); }
+    .progress-track { height: 11px; margin: 20px 0 40px; border-radius: 100px; overflow: hidden; background: #e4ede4; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #087f72, #45bea2); transition: width .4s ease; }
+    .prompt-label { color: var(--muted); font-size: .82rem; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; }
+    .question { min-height: 112px; max-width: 720px; margin: 12px 0 30px; font-size: clamp(1.7rem, 4vw, 2.65rem); font-weight: 800; line-height: 1.22; letter-spacing: -.04em; }
+    .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .answer { min-height: 95px; padding: 18px; border: 2px solid var(--line); border-radius: 18px; background: white; color: var(--ink); text-align: left; font-weight: 800; line-height: 1.4; transition: border-color .2s, transform .2s, background .2s; }
+    .answer:hover:not(:disabled) { border-color: var(--teal); transform: translateY(-2px); }
+    .answer.is-correct { border-color: #087f72; background: #e5f6ec; opacity: 1; }
+    .answer.is-incorrect { border-color: #ca654b; background: #fff0e9; opacity: 1; }
+    .answer-symbol { display: inline-grid; place-items: center; width: 29px; height: 29px; margin-right: 9px; border-radius: 9px; background: #e8f1eb; vertical-align: middle; }
+    .feedback { margin-top: 22px; padding: 21px; border-radius: 18px; background: #e9f6ed; border-left: 5px solid var(--teal); }
+    .feedback.wrong { background: #fff0e9; border-color: #ca654b; }
+    .feedback[hidden] { display: none; }
+    .feedback strong { display: block; margin-bottom: 8px; font-size: 1.12rem; }
+    .feedback p { margin: 7px 0 0; line-height: 1.55; }
+    .fact { color: var(--muted); }
+    .next-row { display: flex; justify-content: flex-end; margin-top: 20px; }
+    .next-row[hidden] { display: none; }
+    .result-number { margin: 14px 0 4px; font-size: clamp(4rem, 13vw, 7rem); line-height: 1; font-weight: 800; letter-spacing: -.085em; color: var(--teal); }
+    .result-grade { display: inline-block; margin: 10px 0 24px; padding: 9px 16px; border-radius: 100px; background: #e0f4eb; color: var(--teal-dark); font-weight: 800; }
+    .result-message { max-width: 660px; }
+    .educational { margin: 28px 0; padding: 22px 24px; border-radius: 19px; background: #fff0dd; border: 1px solid #f4d6ad; line-height: 1.7; }
+    .educational strong { display: block; margin-bottom: 5px; }
+    .footer { padding: 19px 5px; color: var(--muted); font-size: .79rem; line-height: 1.5; }
+    @media (max-width: 600px) {
+      .top-note { display: none; }
+      .answers { grid-template-columns: 1fr; }
+      .answer { min-height: 72px; }
+      .question { min-height: 0; }
+      .next-row .primary { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *:before, *:after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  
+    .feedback-heading{font-weight:850;margin:14px 0 5px}
+    .feedback .feedback-heading:first-of-type{margin-top:16px}
+    .answer:disabled{opacity:1}
+    .answer.is-correct{animation:pop .35s ease-out}
+    .answer.is-incorrect{animation:shake .35s ease-out}
+    @keyframes pop{50%{transform:scale(1.025)}}
+    @keyframes shake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+    .takeaways{margin:28px 0;padding:24px;border-radius:20px;background:#fff0dd;border:1px solid #f4d6ad;line-height:1.65}
+    .takeaways p{margin:12px 0}
+    .takeaways p:last-child{margin-bottom:0}
+    .result-number{overflow-wrap:anywhere}
+    @media(max-width:600px){.screen{padding:24px 20px}.topbar{align-items:flex-start}.brand{font-size:.88rem}.question{font-size:clamp(1.45rem,6vw,2rem)}.feedback{padding:16px}}
+</style>
+</head>
+<body>
+<div class="app-shell"><div class="layout">
+<header class="topbar"><div class="brand-icon" aria-hidden="true">♥</div><span class="brand">CHAGAS / MITOS Y REALIDADES</span><span class="top-note">Aprender también es prevenir</span></header>
+<main class="card">
+<section id="intro" class="screen" aria-labelledby="intro-title">
+<span class="eyebrow">Un juego para derribar mitos</span>
+<h1 id="intro-title">¿Chagas o No Chagas?</h1>
+<p class="lead">Aprende cómo se transmite realmente el parásito y ayuda a derribar mitos.</p>
+<div class="intro-bottom"><button id="start" class="primary" type="button">Comenzar</button><span class="intro-hint">21 situaciones · Explicaciones al instante</span></div>
+</section>
+<section id="game" class="screen" aria-label="Preguntas del juego" hidden>
+<div class="game-head"><span id="counter" class="badge" aria-live="polite"></span><span id="score" class="badge" aria-live="polite"></span></div>
+<div id="progress-track" class="progress-track" role="progressbar" aria-label="Progreso del juego" aria-valuemin="0" aria-valuemax="21" aria-valuenow="0"><div id="progress" class="progress-fill"></div></div>
+<span class="prompt-label">¿Puede transmitir el parásito?</span><h2 id="question" class="question" tabindex="-1"></h2>
+<div class="answers" role="group" aria-label="Elegí una respuesta"><button id="yes" class="answer" data-answer="true" type="button">✅ Sí puede transmitir el parásito</button><button id="no" class="answer" data-answer="false" type="button">❌ No transmite el parásito</button></div>
+<div id="feedback" class="feedback" role="status" aria-live="polite" hidden><strong id="feedback-title"></strong><div class="feedback-heading">¿Por qué?</div><p id="explanation"></p><div class="feedback-heading">🧠 ¿Sabías que...?</div><p id="fact"></p></div>
+<div id="next-row" class="next-row" hidden><button id="next" class="primary" type="button">Siguiente →</button></div>
+</section>
+<section id="result" class="screen" aria-labelledby="result-title" hidden>
+<span class="eyebrow">Tu recorrido termina acá; el aprendizaje sigue</span><h2 id="result-title" tabindex="-1">¡Terminaste el desafío!</h2>
+<div id="percentage" class="result-number" aria-live="polite"></div><div id="grade" class="result-grade"></div><p id="result-message" class="lead result-message"></p>
+<aside class="takeaways"><strong>📌 Lo más importante para recordar</strong>
+<p>✅ Las heces de vinchucas infectadas pueden transmitir el parásito.</p>
+<p>✅ También puede transmitirse durante el embarazo, por transfusiones, trasplantes, alimentos o bebidas contaminadas y contacto con sangre infectada.</p>
+<p>❌ No se transmite por abrazos, besos, mate, convivencia, escuela, trabajo, dar la mano, toser o compartir espacios cotidianos.</p>
+<p>💡 Conocer las verdaderas formas de transmisión del Chagas protege la salud y ayuda a combatir los mitos, el miedo y la discriminación.</p></aside>
+<button id="restart" class="primary" type="button">Volver a jugar ↗</button>
+</section>
+<div class="decoration" aria-hidden="true"></div>
+</main><footer class="footer">Información educativa general. Si tenés dudas sobre exposición, diagnóstico o embarazo, consultá con un equipo de salud.</footer>
+</div></div>
+<script>
+'use strict';
+const situations = [
+  {
+    "q": "🦟 Las heces de una vinchuca infectada entran en contacto con la herida de su picadura.",
+    "yes": true,
+    "why": "A diferencia de los mosquitos, la vinchuca no transmite el parásito directamente a través de su saliva al picar. El contagio ocurre por un \"accidente\" de su propia biología: al alimentarse, su abdomen se dilata tanto que la obliga a defecar inmediatamente al lado de la picadura.",
+    "fact": "El parásito responsable de la enfermedad se llama Trypanosoma cruzi. Cuando la persona se rasca dormida debido a la picazón, arrastra inconscientemente las heces infectadas hacia la herida abierta o hacia zonas sensibles como los ojos o la boca."
+  },
+  {
+    "q": "👁️ Una persona se frota el ojo con dedos contaminados por heces de vinchuca infectada.",
+    "yes": true,
+    "why": "Este descuido involuntario da origen a la manifestación más famosa y visible del Chagas agudo: el Signo de Romaña. Se caracteriza por una inflamación llamativa, elástica y completamente indolora de los párpados de un solo ojo, que a menudo se acompaña de un ojo morado.",
+    "fact": "Aunque es el síntoma más conocido, solo se presenta en una parte de los casos infectados por vía ocular."
+  },
+  {
+    "q": "🤰 Una persona embarazada con Chagas transmite el parásito al bebé durante el embarazo.",
+    "yes": true,
+    "why": "Esto se conoce como transmisión congénita o vertical. No todas las personas gestantes con Chagas transmiten el parásito.",
+    "fact": "El Chagas congénito se cura en casi el 100% de los casos si se trata adecuadamente durante el primer año de vida. La lactancia materna es segura salvo situaciones excepcionales."
+  },
+  {
+    "q": "🩸 Una transfusión de sangre infectada que no fue controlada.",
+    "yes": true,
+    "why": "Una transfusión de sangre infectada representa un mecanismo por el cual el parásito ingresa directamente al cuerpo de una persona sana.",
+    "fact": "Actualmente los bancos de sangre realizan controles obligatorios para prevenir esta vía de transmisión."
+  },
+  {
+    "q": "🥤 Beber o comer alimentos contaminados con heces de vinchucas infectadas.",
+    "yes": true,
+    "why": "Representa la vía de transmisión oral, que ocurre al ingerir alimentos o bebidas contaminados accidentalmente.",
+    "fact": "Se han registrado brotes asociados a jugos artesanales contaminados durante la preparación."
+  },
+  {
+    "q": "💉 Compartir una jeringa usada que contiene sangre infectada.",
+    "yes": true,
+    "why": "El parásito puede ingresar directamente al torrente sanguíneo al compartir elementos cortopunzantes contaminados.",
+    "fact": "La bioseguridad y el uso exclusivo de agujas y jeringas son medidas fundamentales de prevención."
+  },
+  {
+    "q": "🧪 Un pinchazo accidental con material biológico infectado en un laboratorio.",
+    "yes": true,
+    "why": "Es una vía reconocida de transmisión accidental por exposición ocupacional.",
+    "fact": "La bioseguridad protege a quienes trabajan con muestras biológicas. Usar guantes y protección ocular es fundamental."
+  },
+  {
+    "q": "🦟 Un mosquito pica a una persona con Chagas y después a otra.",
+    "yes": false,
+    "why": "Los mosquitos no pueden transmitir el parásito del Chagas.",
+    "fact": "Los mosquitos transmiten dengue o zika, pero no Trypanosoma cruzi."
+  },
+  {
+    "q": "🪳 ¿Las cucarachas pueden transmitir el parásito que causa el Chagas?",
+    "yes": false,
+    "why": "Las cucarachas comunes no son vectores biológicos de esta enfermedad.",
+    "fact": "El vector reconocido es la vinchuca."
+  },
+  {
+    "q": "🐔 ¿Las gallinas transmiten el parásito que causa el Chagas?",
+    "yes": false,
+    "why": "Las aves no transmiten el parásito a las personas.",
+    "fact": "Las vinchucas suelen alimentarse de gallinas, por eso los gallineros deben mantenerse alejados de los dormitorios."
+  },
+  {
+    "q": "😘 Una persona con Chagas le da un beso en la mejilla a otra.",
+    "yes": false,
+    "why": "El Chagas no se transmite por contacto afectivo cotidiano.",
+    "fact": "Los mitos sobre el contagio han generado discriminación durante décadas."
+  },
+  {
+    "q": "🧉 Compartir mate con una persona que tiene Chagas.",
+    "yes": false,
+    "why": "El parásito no vive en la saliva ni se transmite compartiendo bombillas.",
+    "fact": "Compartir mate es completamente seguro desde el punto de vista del Chagas."
+  },
+  {
+    "q": "🤗 Abrazar a una persona que tiene Chagas.",
+    "yes": false,
+    "why": "El parásito no se transmite por la piel ni por el contacto físico.",
+    "fact": "Los abrazos no contagian, pero sí ayudan."
+  },
+  {
+    "q": "🤝 Dar la mano a una persona que tiene Chagas.",
+    "yes": false,
+    "why": "Dar la mano es completamente seguro.",
+    "fact": "Las personas con Chagas pueden trabajar, cocinar, estudiar o practicar deportes sin poner en riesgo a otras personas."
+  },
+  {
+    "q": "🏠 Vivir en la misma casa que una persona que tiene Chagas.",
+    "yes": false,
+    "why": "La convivencia cotidiana no transmite la enfermedad.",
+    "fact": "El riesgo real es la presencia de vinchucas, no la convivencia con alguien que tenga Chagas."
+  },
+  {
+    "q": "✏️ Compartir lápices o cuadernos en la escuela con una persona que tiene Chagas.",
+    "yes": false,
+    "why": "Los útiles escolares no transmiten el parásito.",
+    "fact": "Ningún niño o niña debe ser excluido por tener Chagas."
+  },
+  {
+    "q": "❤️ Tener relaciones sexuales con una persona que tiene Chagas.",
+    "yes": false,
+    "why": "No es una vía habitual ni reconocida de transmisión.",
+    "fact": "El Chagas no está clasificado como una infección de transmisión sexual."
+  },
+  {
+    "q": "🤧 Toser o estornudar cerca de una persona que tiene Chagas.",
+    "yes": false,
+    "why": "El parásito no se transmite por el aire.",
+    "fact": "A diferencia de la gripe o el COVID‑19, el Chagas no es una enfermedad respiratoria."
+  },
+  {
+    "q": "🚽 Usar el mismo baño que una persona que tiene Chagas.",
+    "yes": false,
+    "why": "Compartir instalaciones sanitarias es completamente seguro.",
+    "fact": "No existen medidas de aislamiento para personas con Chagas."
+  },
+  {
+    "q": "🦟 Una vinchuca infectada te pica, pero no deja heces sobre tu piel.",
+    "yes": false,
+    "why": "La picadura por sí sola no transmite el parásito.",
+    "fact": "Lo que transmite la enfermedad son las heces infectadas cuando ingresan por una herida o por una mucosa."
+  },
+  {
+    "q": "🐕 ¿La mordedura de un perro o gato con Chagas transmite la enfermedad?",
+    "yes": false,
+    "why": "La mordedura no transmite el parásito.",
+    "fact": "Los perros y gatos pueden estar infectados, pero su saliva no transmite la enfermedad."
+  }
+];
+const intro=document.getElementById('intro'),game=document.getElementById('game'),result=document.getElementById('result');
+const answerButtons=[document.getElementById('yes'),document.getElementById('no')];
+let order=[],position=0,points=0,answered=false;
+function show(screen){for(const s of [intro,game,result])s.hidden=s!==screen;}
+function shuffle(items){const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function progress(n){document.getElementById('progress').style.width=(n/order.length*100)+'%';document.getElementById('progress-track').setAttribute('aria-valuenow',String(n));}
+function renderQuestion(){answered=false;const item=order[position];document.getElementById('counter').textContent=`Pregunta ${position+1} de ${order.length}`;document.getElementById('score').textContent=`Aciertos: ${points}`;document.getElementById('question').textContent=item.q;for(const b of answerButtons){b.disabled=false;b.classList.remove('is-correct','is-incorrect');}document.getElementById('feedback').hidden=true;document.getElementById('next-row').hidden=true;document.getElementById('next').textContent=position===order.length-1?'Ver resultados →':'Siguiente →';progress(position);document.getElementById('question').focus();}
+function startGame(){order=shuffle(situations);position=0;points=0;show(game);renderQuestion();}
+function answer(value,button){if(answered)return;answered=true;const item=order[position],correct=value===item.yes;if(correct)points++;for(const b of answerButtons){b.disabled=true;if(b.dataset.answer===String(item.yes))b.classList.add('is-correct');}if(!correct)button.classList.add('is-incorrect');const f=document.getElementById('feedback');f.classList.toggle('wrong',!correct);document.getElementById('feedback-title').textContent=correct?'✅ ¡Correcto! Has identificado correctamente esta situación.':'❌ Respuesta incorrecta. No te preocupes, el objetivo es aprender.';document.getElementById('explanation').textContent=item.why;document.getElementById('fact').textContent=item.fact;f.hidden=false;document.getElementById('score').textContent=`Aciertos: ${points}`;progress(position+1);document.getElementById('next-row').hidden=false;}
+function finish(){const percent=Math.round(points/order.length*100);document.getElementById('percentage').textContent=percent+'%';let grade,message;if(percent>=90){grade='🏆 Experto en Mitos y Realidades del Chagas';message='¡Felicitaciones! Conoces las principales formas de transmisión y puedes ayudar a derribar falsas creencias.';}else if(percent>=70){grade='🥇 Promotor del Conocimiento sobre Chagas';message='Reconoces la mayoría de las formas reales de transmisión.';}else if(percent>=50){grade='📚 Sigue aprendiendo';message='Ya conoces muchas respuestas correctas y estás cada vez más cerca de convertirte en experto.';}else{grade='🌱 Gracias por participar';message='Cada respuesta es una oportunidad para aprender.';}document.getElementById('grade').textContent=grade;document.getElementById('result-message').textContent=message;show(result);document.getElementById('result-title').focus();}
+document.getElementById('start').addEventListener('click',startGame);document.getElementById('restart').addEventListener('click',startGame);for(const b of answerButtons)b.addEventListener('click',()=>answer(b.dataset.answer==='true',b));document.getElementById('next').addEventListener('click',()=>{if(!answered)return;position++;if(position<order.length)renderQuestion();else finish();});
+</script></body></html>
